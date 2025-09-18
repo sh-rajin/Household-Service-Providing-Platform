@@ -18,6 +18,7 @@ class Review(models.Model):
         # Service-এর rating ও review_count update
         service = self.service
         reviews = service.reviews.all()
+        service.review_count = reviews.count()
         service.rating = sum(r.rating for r in reviews) / reviews.count()
         service.save()
 

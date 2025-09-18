@@ -9,7 +9,7 @@ class Service(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     duration = models.IntegerField(help_text="Duration in hours")
     rating = models.FloatField(default=0.0)
-    # review_count = models.IntegerField(default=0)
+    review_count = models.IntegerField(default=0, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
