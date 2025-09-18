@@ -56,7 +56,7 @@ class ServiceDetailAPIView(APIView):
 
 class TopRatedServiceAPIView(APIView):
     def get(self, request):
-        top_rated = Service.objects.order_by('-rating')[:10]
+        top_rated = Service.objects.filter(rating__gt=0).order_by('-rating')[:10]
         serializer = ServiceSerializer(top_rated, many=True)
         return Response(serializer.data)
 
