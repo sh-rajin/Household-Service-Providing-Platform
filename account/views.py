@@ -25,7 +25,7 @@ class RegistrationAPIView(APIView):
             customer = Customer.objects.create(
                 user=user,
                 address = request.data.get('address'),
-                image = request.data.get('image')
+                image = request.FILES.get('image')
             )
             token = default_token_generator.make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
@@ -48,7 +48,9 @@ def activate(request, uidb64, token):
     if user is not None and default_token_generator.check_token(user, token):
         user.is_active = True
         user.save()
-        Response({"message": "Account activated successfully"})
+        return Response({"message": "Account activated successfully"})
+    else:
+        return Response({"message": "Activation link is invalid"}, status=400)
     
         
 class LoginAPIView(APIView):

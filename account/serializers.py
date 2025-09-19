@@ -14,7 +14,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ('username', 'password', 'confirm_password', 'first_name', 'last_name', 'email', 'role','phone')
+        fields = ('username', 'password', 'confirm_password', 'first_name', 'last_name', 'email','phone')
         
     def save(self):
         username = self.validated_data['username']
@@ -23,7 +23,6 @@ class RegistrationSerializer(serializers.ModelSerializer):
         first_name = self.validated_data['first_name']
         last_name = self.validated_data['last_name']
         email = self.validated_data['email']
-        role = self.validated_data['role']
         phone = self.validated_data['phone']
         
         if password != confirm_password:
@@ -40,8 +39,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
             first_name=first_name,
             last_name=last_name,
             email=email,
-            password=password,
-            role = role,
+            role = "customer",
             phone = phone
         )
         
