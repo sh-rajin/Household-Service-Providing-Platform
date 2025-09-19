@@ -10,8 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
-import pymysql
-pymysql.install_as_MySQLdb()
+# import pymysql
+# pymysql.install_as_MySQLdb()
 
 from pathlib import Path
 import environ
@@ -88,23 +88,23 @@ WSGI_APPLICATION = 'householdService_Api.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',   # use mysql
-        'NAME': 'household_service',         # your db name
-        'USER': 'root',                  # mysql username
-        'PASSWORD': env('DB_PASSWORD'),            # mysql password
-        'HOST': '127.0.0.1',                    # or IP address
-        'PORT': '3306',                         # default mysql port
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',   # use mysql
+#         'NAME': 'household_service',         # your db name
+#         'USER': 'root',                  # mysql username
+#         'PASSWORD': env('DB_PASSWORD'),            # mysql password
+#         'HOST': '127.0.0.1',                    # or IP address
+#         'PORT': '3306',                         # default mysql port
+#     }
+# }
 
 
 
