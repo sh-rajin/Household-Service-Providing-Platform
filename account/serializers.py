@@ -10,7 +10,6 @@ from .models import Customer, User
 class RegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     confirm_password = serializers.CharField(write_only=True)
-    role = serializers.ChoiceField(choices=User.ROLE_CHOICES)
     
     class Meta:
         model = User
@@ -39,7 +38,6 @@ class RegistrationSerializer(serializers.ModelSerializer):
             first_name=first_name,
             last_name=last_name,
             email=email,
-            role = "customer",
             phone = phone
         )
         
