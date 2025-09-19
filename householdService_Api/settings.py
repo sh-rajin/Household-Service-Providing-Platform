@@ -98,7 +98,7 @@ DATABASES = {
         'NAME': 'household_service',         # your db name
         'USER': 'root',                  # mysql username
         'PASSWORD': env('DB_PASSWORD'),            # mysql password
-        'HOST': 'localhost',                    # or IP address
+        'HOST': '127.0.0.1',                    # or IP address
         'PORT': '3306',                         # default mysql port
     }
 }
