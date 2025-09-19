@@ -5,7 +5,9 @@ from rest_framework.views import APIView
 from .models import Service
 from .serializers import ServiceSerializer
 from rest_framework.decorators import action
-from rest_framework.response import Response
+from reviews.models import Review
+from reviews.serializers import ReviewSerializer
+from rest_framework.permissions import AllowAny
 
 # Create your views here.
 
@@ -60,3 +62,74 @@ class TopRatedServiceAPIView(APIView):
         serializer = ServiceSerializer(top_rated, many=True)
         return Response(serializer.data)
 
+
+
+
+class ServiceReviewAPIView(APIView):
+    
+    def get(self, request, pk):
+        try:
+            service = Service.objects.get(id=pk)
+        except Service.DoesNotExist:
+            return Response({'error': "Service Not Found!"}, status=status.HTTP_404_NOT_FOUND)
+
+        reviews = Review.objects.filter(service=service)
+        serializer = ReviewSerializer(reviews, many=True)
+        return Response(serializer.data)
+    
+    
+    def post(self, request, pk):
+        try:
+            service = Service.objects.get(id=pk)
+        except Service.DoesNotExist:
+            return Response({'error': "Service Not Found!"}, status=status.HTTP_404_NOT_FOUND)
+        
+        # data = request.data.copy()
+        # data['user'] = request.user.id
+        
+        serializer = ReviewSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(service=service, user=request.user)
+            return Response(data=serializer.data)
+        return Response(serializer.errors)
+    
+    
+class ServiceReviewDetailAPIView(APIView):
+    def get_object(self, review_id):
+        try:
+            return Review.objects.get(pk=review_id)
+        except Review.DoesNotExist:
+            return None
+        
+    def get(self, request, pk, review_id):
+        review = self.get_object(review_id)
+        
+        if review:
+            serializer = ReviewSerializer(review)
+            return Response(serializer.data)
+        return Response({'error': 'Review not found!'})
+    
+    def put(self, request, pk, review_id):
+        review = self.get_object(review_id)
+        
+        if review:
+            serializer = ReviewSerializer(review, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+        return Response({'error': 'Review not found!'})
+    
+    
+    def delete(self, request, pk, review_id):
+        review = self.get_object(review_id)
+        
+        if review:
+            review.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)     
+        return Response({'error': 'Review not found!'})
+    
+   
+    
+        
+    
+        

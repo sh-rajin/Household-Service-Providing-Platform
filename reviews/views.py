@@ -3,23 +3,32 @@ from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Review
+from services.models import Service
 from .serializers import ReviewSerializer
 
 
 # Create your views here.
 
-class ReviewListCreateAPIView(APIView):
+class ReviewListAPIView(APIView):
     def get(self, request):
         reviews = Review.objects.all()
         serializer = ReviewSerializer(reviews, many=True)
         return Response(serializer.data)
-    
-    def post(self, request):
-        serializer = ReviewSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors)
+
+# class ServiceReviewCreateAPIView(APIView): 
+#     def post(self, request, service_id):
+#         try:
+#             service = Service.objects.get(id=service_id)
+#         except Service.DoesNotExist:
+#             return Response({"error": "Service not found"}, status=status.HTTP_404_NOT_FOUND)
+#         data = request.data.copy()
+#         data['service'] = service.id
+#         data['user'] = request.user.id
+#         serializer = ReviewSerializer(data=data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data)
+#         return Response(serializer.errors)
     
     
 class ReviewDetailAPIView(APIView):
