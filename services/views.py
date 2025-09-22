@@ -8,12 +8,24 @@ from rest_framework.decorators import action
 from reviews.models import Review
 from reviews.serializers import ReviewSerializer
 from rest_framework.permissions import AllowAny
+from django.db.models import Q
 
 # Create your views here.
 
 class ServiceListCreateAPIView(APIView):
     def get(self, request):
         services = Service.objects.all()
+        
+        query = request.query_params.get('q', None)
+        category = request.query_params.get('category', None)
+        
+        if query:
+            services = services.filter(Q(name__icontains=query) | Q(description__icontains=query))
+        
+        if category:
+            services = services.filter(category__name__icontains=category)
+        
+        
         serializer = ServiceSerializer(services, many=True)
         return Response(serializer.data)
     

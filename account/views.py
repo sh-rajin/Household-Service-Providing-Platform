@@ -8,7 +8,8 @@ from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from rest_framework.authtoken.models import Token 
-from .models import Customer, User
+from customer.models import Customer
+from django.contrib.auth.models import User
 from .serializers import RegistrationSerializer, LoginSerializer
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
@@ -18,15 +19,14 @@ from rest_framework.permissions import IsAuthenticated
    
     
 class RegistrationAPIView(APIView):
-    
     def post(self, request):
         serializer = RegistrationSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            customer = Customer.objects.create(
+            Customer.objects.create(
                 user=user,
-                address = request.data.get('address'),
-                image = request.FILES.get('image')
+                phone = request.data.get('phone'),
+                address = request.data.get('address')
             )
             token = default_token_generator.make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
@@ -84,3 +84,60 @@ class LogoutAPIView(APIView):
         self.request.user.auth_token.delete()
         logout(request)
         return Response({"message": "Account Logout successfully"})
+    
+    
+    
+class Customer(APIView):
+    permission_classes = [IsAuthenticated]
+    def get(self, request):
+        try:
+            customer = Customer.objects.get(user=request.user)
+            data = {
+                'username': request.user.username,
+                'first_name': request.user.first_name,
+                'last_name': request.user.last_name,
+                'email': request.user.email,
+                'phone': customer.phone,
+                'address': customer.address
+            }
+            return Response(data)
+        except Customer.DoesNotExist:
+            return Response({'error': 'Customer profile not found'}, status=404)
+        
+    def put(self, request):
+        try:
+            customer = Customer.objects.get(user=request.user)
+            user = request.user
+            user.username = request.data.get('username', user.username)
+            user.first_name = request.data.get('first_name', user.first_name)
+            user.last_name = request.data.get('last_name', user.last_name)
+            customer.phone = request.data.get('phone', customer.phone)  
+            customer.address = request.data.get('address', customer.address)
+            user.save()
+            customer.save()
+            return Response({'message': 'Profile updated successfully'})
+        except Customer.DoesNotExist:
+            return Response({'error': 'Customer profile not found'}, status=404)
+
+            
+            
+class ChangePassword(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def put(self, request):
+        user = request.user
+        old_password = request.data.get('old_password')
+        new_password = request.data.get('new_password')
+        confirm_password = request.data.get('confirm_password')
+        
+        if not user.check_password(old_password):
+            return Response({'error' : "Old Password is incorrect"}, status=400)
+        
+        if new_password != confirm_password:
+            return Response({'error' : "New Password and Confirm Password do not match"}, status=400)
+        
+        user.set_password(new_password)
+        user.save()
+        return Response({'message' : "Password changed successfully"})
+    
+    

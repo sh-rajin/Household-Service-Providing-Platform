@@ -2,7 +2,10 @@ from django.db import models
 from categories.models import Category
 # Create your models here.
 
+
+
 class Service(models.Model):
+    icon = models.ImageField(upload_to='service_icons/', blank=True, null=True)
     name = models.CharField(max_length=100)
     description = models.TextField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE)

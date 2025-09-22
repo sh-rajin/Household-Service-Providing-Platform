@@ -50,6 +50,8 @@ INSTALLED_APPS = [
     'categories',
     'account',
     'reviews',
+    'bookings',
+    'customer',
 ]
 
 MIDDLEWARE = [
@@ -160,7 +162,6 @@ CORS_ALLOWED_ORIGINS = [
 ]
 
 
-AUTH_USER_MODEL = 'account.User'
 
 
 

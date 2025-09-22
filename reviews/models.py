@@ -1,6 +1,6 @@
 from django.db import models
 from services.models import Service
-from account.models import User
+from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator
 # Create your models here.
 
@@ -13,9 +13,8 @@ class Review(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)  # প্রথমে review save হবে
+        super().save(*args, **kwargs)  
 
-        # Service-এর rating ও review_count update
         service = self.service
         reviews = service.reviews.all()
         service.review_count = reviews.count()

@@ -15,20 +15,30 @@ class ReviewListAPIView(APIView):
         serializer = ReviewSerializer(reviews, many=True)
         return Response(serializer.data)
 
-# class ServiceReviewCreateAPIView(APIView): 
-#     def post(self, request, service_id):
-#         try:
-#             service = Service.objects.get(id=service_id)
-#         except Service.DoesNotExist:
-#             return Response({"error": "Service not found"}, status=status.HTTP_404_NOT_FOUND)
-#         data = request.data.copy()
-#         data['service'] = service.id
-#         data['user'] = request.user.id
-#         serializer = ReviewSerializer(data=data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data)
-#         return Response(serializer.errors)
+class ServiceReviewCreateAPIView(APIView): 
+    def get(self, request, service_id):
+        try:
+            service = Service.objects.get(id=service_id)
+        except Service.DoesNotExist:
+            return Response({"error": "Service not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+        reviews = Review.objects.filter(service=service)
+        serializer = ReviewSerializer(reviews, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request, service_id):
+        try:
+            service = Service.objects.get(id=service_id)
+        except Service.DoesNotExist:
+            return Response({"error": "Service not found"}, status=status.HTTP_404_NOT_FOUND)
+        data = request.data.copy()
+        data['service'] = service.id
+        data['user'] = request.user.id
+        serializer = ReviewSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
     
     
 class ReviewDetailAPIView(APIView):

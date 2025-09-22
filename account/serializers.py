@@ -1,19 +1,13 @@
 from rest_framework import serializers
-from .models import Customer, User
+from django.contrib.auth.models import User
 
-# class CustomerSerializer(serializers.ModelSerializer):
-    
-#     class Meta:
-#         model = Customer
-#         fields = '__all__'
-        
 class RegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     confirm_password = serializers.CharField(write_only=True)
     
     class Meta:
         model = User
-        fields = ('username', 'password', 'confirm_password', 'first_name', 'last_name', 'email','phone')
+        fields = ('username', 'password', 'confirm_password', 'first_name', 'last_name', 'email')
         
     def save(self):
         username = self.validated_data['username']
@@ -22,7 +16,6 @@ class RegistrationSerializer(serializers.ModelSerializer):
         first_name = self.validated_data['first_name']
         last_name = self.validated_data['last_name']
         email = self.validated_data['email']
-        phone = self.validated_data['phone']
         
         if password != confirm_password:
             raise serializers.ValidationError({'password': 'Passwords must match.'})
@@ -37,8 +30,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
             username=username,
             first_name=first_name,
             last_name=last_name,
-            email=email,
-            phone = phone
+            email=email
         )
         
         user.set_password(password)
