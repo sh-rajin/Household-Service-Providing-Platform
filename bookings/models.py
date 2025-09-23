@@ -1,6 +1,6 @@
 from django.db import models
 from services.models import Service
-from account.models import Customer
+from customer.models import Customer
 # Create your models here.
 
 class Booking(models.Model):
