@@ -8,7 +8,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes
 from rest_framework.authtoken.models import Token 
-from customer.models import Customer
+from .models import Customer
 from django.contrib.auth.models import User
 from .serializers import RegistrationSerializer, LoginSerializer
 from django.core.mail import EmailMultiAlternatives
@@ -25,19 +25,22 @@ class RegistrationAPIView(APIView):
             user = serializer.save()
             Customer.objects.create(
                 user=user,
-                phone = request.data.get('phone'),
-                address = request.data.get('address')
+                phone=request.data.get('phone'),
+                address=request.data.get('address')
             )
+            
             token = default_token_generator.make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
-            confirm_link = f'http://127.0.0.1:8000/api/activate/{uid}/{token}/'
+            confirm_link = f'http://127.0.0.1:8000/auth/activate/{uid}/{token}/'
             email_subject = 'Activate your account'
-            email_body = render_to_string('account/activation.html',{'Confirm_Email': confirm_link})
-            email = EmailMultiAlternatives(email_subject,"", to=[user.email])
+            email_body = render_to_string('account/activation.html', {'Confirm_Email': confirm_link})
+            email = EmailMultiAlternatives(email_subject, "", to=[user.email])
             email.attach_alternative(email_body, "text/html")
             email.send()
+            
             return Response({'message': 'User registered successfully. Please check your email to activate your account.'}, status=201)
         return Response(serializer.errors, status=400)
+
     
 def activate(request, uidb64, token):
     try:
@@ -87,7 +90,22 @@ class LogoutAPIView(APIView):
     
     
     
-class Customer(APIView):
+class CustomerListAPIView(APIView):
+    def get(self, request):
+        customers = Customer.objects.all()
+        data = []
+        for customer in customers:
+            data.append({
+                'username': customer.user.username,
+                'first_name': customer.user.first_name,
+                'last_name': customer.user.last_name,
+                'email': customer.user.email,
+                'phone': customer.phone,
+                'address': customer.address
+            })
+        return Response(data)
+
+class CustomerAPIView(APIView):
     permission_classes = [IsAuthenticated]
     def get(self, request):
         try:
@@ -118,7 +136,6 @@ class Customer(APIView):
             return Response({'message': 'Profile updated successfully'})
         except Customer.DoesNotExist:
             return Response({'error': 'Customer profile not found'}, status=404)
-
             
             
 class ChangePassword(APIView):
